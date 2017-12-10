@@ -27,10 +27,13 @@ public:
 	bool loadFromRenderedText(SDL_Renderer* renderer, std::string textureText, SDL_Color textColor);
 
 	// deallocates texture
-	void free();
+	void freeTexture();
 
 	// set color modulation
 	void setColor(Uint8 red, Uint8 green, Uint8 blue);
+
+	// set color key
+	void setColorKey(Uint8 red, Uint8 green, Uint8 blue);
 
 	// set blending
 	void setBlendMode(SDL_BlendMode blending);
@@ -55,6 +58,9 @@ private:
 	// font for text texture
 	TTF_Font* mFont;
 
+	// color key
+	SDL_Color colorKey;
+
 	// image dimensions
 	int mWidth;
 	int mHeight;
@@ -69,13 +75,13 @@ LTexture::LTexture(){
 
 LTexture::~LTexture(){
 	// deallocate
-	free();
+	freeTexture();
 }
 
 bool LTexture::loadFromFile(SDL_Renderer* renderer, std::string path)
 {
 	// get rid of preexisting texture
-	free();
+	freeTexture();
 
 	// the final texture
 	SDL_Texture* newTexture = NULL;
@@ -86,7 +92,7 @@ bool LTexture::loadFromFile(SDL_Renderer* renderer, std::string path)
 		printf("Unable to load image %s! SDL_image Error: %s\n", path.c_str(), IMG_GetError());
 	} else {
 		// color key image
-		//SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 0, 0xFF, 0xFF));
+		SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, colorKey.r,colorKey.g,colorKey.b));
 
 		// create texture from surface pixels
 		newTexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
@@ -139,8 +145,8 @@ bool LTexture::loadFromRenderedText(SDL_Renderer* renderer, std::string textureT
 	return mTexture != NULL;
 }
 
-void LTexture::free(){
-	// free texture if it exists
+void LTexture::freeTexture(){
+	// freeTexture texture if it exists
 	if (mTexture != NULL){
 		SDL_DestroyTexture(mTexture);
 		mTexture = NULL;
@@ -156,6 +162,10 @@ void LTexture::free(){
 void LTexture::setColor(Uint8 red, Uint8 green, Uint8 blue){
 	// modulate texture rgb
 	SDL_SetTextureColorMod(mTexture, red, green, blue);
+}
+
+void LTexture::setColorKey(Uint8 red, Uint8 green, Uint8 blue) {
+	colorKey = { red,green,blue };
 }
 
 void LTexture::setBlendMode(SDL_BlendMode blending){
