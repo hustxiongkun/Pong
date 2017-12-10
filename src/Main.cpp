@@ -3,6 +3,21 @@
 // File:    Main.cpp
 //////////////////////////////////////////////////////////////////////////////////
 
+// memory leak
+#ifdef _DEBUG
+#define  DEBUG_CLIENTBLOCK new(_CLIENT_BLOCK,__FILE__,__LINE__)
+#else
+#define DEBUG_CLIENTBLOCK
+#endif // _DEBUG
+
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
+#ifdef _DEBUG
+#define new DEBUG_CLIENTBLOCK
+#endif // _DEBUG
+
 // links
 #pragma comment(lib, "SDL2.lib")
 #pragma comment(lib, "SDL2main.lib")
@@ -78,6 +93,9 @@ void changeBallSpeed(Ball* ball);
 void changeComputerStickySpeed();
 
 int main(int argc, char** argv) {
+	// detect memory leak
+	//_CrtSetBreakAlloc(1385);
+	_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF);
 
 	// start up SDL and create window
 	if (!initSDL()) {
